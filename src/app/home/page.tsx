@@ -8,6 +8,7 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import Header from "@/components/Header";
 import Title from "@/components/Title";
 import { travelService } from "@/services/travelService";
+import TravelCard from "@/components/TravelCard";
 
 interface Travel {
   id: string;
@@ -58,6 +59,7 @@ export default function Perfil() {
   }, [token]);
 
   if (!userData) return <p>Carregando...</p>;
+  if (loading) return <p>Carregando...</p>;
 
   return (
     <div>
@@ -78,15 +80,15 @@ export default function Perfil() {
           </p>
         </div>
         <Title>Minhas viagens</Title>
-        <div>
+        <div className="space-y-2">
           {travels.map((travel) => (
-            <li key={travel.id}>
-              <h3>{travel.destination}</h3>
-              <p>
-                De: {new Date(travel.startDate).toLocaleDateString()} até{" "}
-                {new Date(travel.endDate).toLocaleDateString()}
-              </p>
-            </li>
+            <TravelCard
+              destination={travel.destination}
+              startDate={travel.startDate}
+              endDate={travel.endDate}
+              id={travel.id}
+              key={travel.id}
+            />
           ))}
         </div>
       </div>

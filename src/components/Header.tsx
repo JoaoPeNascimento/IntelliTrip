@@ -7,7 +7,7 @@ import { MenuIcon } from "lucide-react";
 
 const Header = () => {
   return (
-    <Card>
+    <Card className="border-solid border-b-gray-300">
       <CardContent className="flex flex-row justify-between items-center">
         <Link href="/home">
           <Image src="/Logo.png" alt="Logo" width={120} height={18} />
@@ -15,7 +15,7 @@ const Header = () => {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="icon" className="bg-blue-600">
+            <Button size="icon">
               <MenuIcon />
             </Button>
           </SheetTrigger>
