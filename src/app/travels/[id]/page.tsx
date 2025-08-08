@@ -3,11 +3,16 @@
 import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Title from "@/components/Title";
+import { inviteService } from "@/services/inviteService";
 import { travelService } from "@/services/travelService";
 import { useAuthStore } from "@/stores/authStore";
 import { PlaneLanding, PlaneTakeoff } from "lucide-react";
 import { useEffect, useState } from "react";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+interface Invite {
+  recieverEmail: string;
+}
 interface Travel {
   id: string;
   destination: string;
@@ -25,6 +30,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const { id } = params;
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
+  const [invites, setInvites] = useState<string[]>([]);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -40,9 +46,20 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       }
     };
 
+    const fetchInvites = async () => {
+      if (!token) return;
+
+      try {
+        const invites = await inviteService.getInvitesByTrip(id, token);
+        setInvites(invites);
+      } catch (error) {
+        console.error("Erro ao buscar dados da viagem: " + error);
+      }
+    };
+
     const loadWithDelay = async () => {
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-      await Promise.all([travelFetch(), delay]);
+      await Promise.all([travelFetch(), fetchInvites(), delay]);
       setLoading(false);
       setShowSpinner(false);
     };
@@ -72,6 +89,9 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               </span>
             </p>
             <Title>Convidados</Title>
+            {invites.map((invite) => (
+              <p key={invite}>{invite}</p>
+            ))}
           </div>
         </>
       )}
