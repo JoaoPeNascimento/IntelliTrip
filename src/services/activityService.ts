@@ -8,7 +8,7 @@ interface Activity {
 }
 
 export const activityService = {
-  async getActivitysByTrip(travelId: string, token: string) {
+  async getActivitiesByTrip(travelId: string, token: string) {
     try {
       const response = await fetch(`${apiUrl}/activity/${travelId}`, {
         method: "GET",

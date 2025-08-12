@@ -1,5 +1,6 @@
 "use client";
 
+import ActivityCard from "@/components/ActivityCard";
 import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Title from "@/components/Title";
@@ -36,7 +37,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
   const [invites, setInvites] = useState<string[]>([]);
-  const [activitys, setActivitys] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -63,12 +64,12 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       }
     };
 
-    const fetchActivitys = async () => {
+    const fetchActivities = async () => {
       if (!token) return;
 
       try {
-        const activitys = await activityService.getActivitysByTrip(id, token);
-        setActivitys(activitys);
+        const activitys = await activityService.getActivitiesByTrip(id, token);
+        setActivities(activitys);
       } catch (error) {
         console.error("Erro ao buscar dados da viagem: " + error);
       }
@@ -79,7 +80,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       await Promise.all([
         travelFetch(),
         fetchInvites(),
-        fetchActivitys(),
+        fetchActivities(),
         delay,
       ]);
       setLoading(false);
@@ -117,17 +118,22 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
                   {invite}
                 </p>
               ))}
-              <Button>
+              <Button variant={"outline"}>
                 Criar convite
                 <PlusCircleIcon />{" "}
               </Button>
             </div>
             <Title>Atividades</Title>
-            {activitys.map((activity) => (
-              <p className="text-gray-500" key={activity.id}>
-                {activity.name}
-              </p>
-            ))}
+            <div className="space-y-2">
+              {activities.map((activity) => (
+                <ActivityCard
+                  name={activity.name}
+                  key={activity.id}
+                  description={activity.description}
+                  date={activity.date}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
