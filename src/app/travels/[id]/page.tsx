@@ -41,6 +41,19 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const deleteActivity = async (activityId: string, token: string | null) => {
+    if (!token) return;
+
+    setLoading(true);
+    const success = await activityService.deleteActivity(activityId, token);
+    if (success) {
+      setActivities((prev) => prev.filter((a) => a.id !== activityId));
+    } else {
+      alert("Falha ao deletar atividade.");
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     const travelFetch = async () => {
       if (!token) return;
@@ -68,8 +81,8 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       if (!token) return;
 
       try {
-        const activitys = await activityService.getActivitiesByTrip(id, token);
-        setActivities(activitys);
+        const activities = await activityService.getActivitiesByTrip(id, token);
+        setActivities(activities);
       } catch (error) {
         console.error("Erro ao buscar dados da viagem: " + error);
       }
@@ -131,6 +144,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
                   key={activity.id}
                   description={activity.description}
                   date={activity.date}
+                  onDelete={() => deleteActivity(activity.id, token)}
                 />
               ))}
             </div>
