@@ -3,16 +3,14 @@
 import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Title from "@/components/Title";
+import { Button } from "@/components/ui/button";
+import { activityService } from "@/services/activityService";
 import { inviteService } from "@/services/inviteService";
 import { travelService } from "@/services/travelService";
 import { useAuthStore } from "@/stores/authStore";
-import { PlaneLanding, PlaneTakeoff } from "lucide-react";
+import { PlaneLanding, PlaneTakeoff, PlusCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-interface Invite {
-  recieverEmail: string;
-}
 interface Travel {
   id: string;
   destination: string;
@@ -26,11 +24,19 @@ interface TravelDetailProps {
   };
 }
 
+interface Activity {
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+}
+
 const TravelDetail = ({ params }: TravelDetailProps) => {
   const { id } = params;
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
   const [invites, setInvites] = useState<string[]>([]);
+  const [activitys, setActivitys] = useState<Activity[]>([]);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -57,9 +63,25 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       }
     };
 
+    const fetchActivitys = async () => {
+      if (!token) return;
+
+      try {
+        const activitys = await activityService.getActivitysByTrip(id, token);
+        setActivitys(activitys);
+      } catch (error) {
+        console.error("Erro ao buscar dados da viagem: " + error);
+      }
+    };
+
     const loadWithDelay = async () => {
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-      await Promise.all([travelFetch(), fetchInvites(), delay]);
+      await Promise.all([
+        travelFetch(),
+        fetchInvites(),
+        fetchActivitys(),
+        delay,
+      ]);
       setLoading(false);
       setShowSpinner(false);
     };
@@ -89,8 +111,22 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               </span>
             </p>
             <Title>Convidados</Title>
-            {invites.map((invite) => (
-              <p key={invite}>{invite}</p>
+            <div className="space-y-1">
+              {invites.map((invite) => (
+                <p className="text-gray-500" key={invite}>
+                  {invite}
+                </p>
+              ))}
+              <Button>
+                Criar convite
+                <PlusCircleIcon />{" "}
+              </Button>
+            </div>
+            <Title>Atividades</Title>
+            {activitys.map((activity) => (
+              <p className="text-gray-500" key={activity.id}>
+                {activity.name}
+              </p>
             ))}
           </div>
         </>

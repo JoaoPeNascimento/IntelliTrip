@@ -20,11 +20,13 @@ export const inviteService = {
       }
 
       const data: Invite[] = await response.json();
-      const emails = data.map((invite) => invite.recieverEmail);
 
-      console.log(emails);
+      const uniqueEmails = [
+        ...new Set(data.map((invite) => invite.recieverEmail)),
+      ];
 
-      return emails;
+      console.log(uniqueEmails);
+      return uniqueEmails;
     } catch (error) {
       console.error("Erro ao buscar convites:", error);
       return [];
