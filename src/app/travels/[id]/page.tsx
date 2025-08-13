@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import TravelTitle from "@/components/TravelTitle";
+import { ActivityDialogContent } from "@/components/ActivityDialogContent";
 
 interface Travel {
   id: string;
@@ -61,7 +62,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Estados para edição
+  // Estados para edição de atividade
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null
@@ -70,11 +71,17 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const [formDescription, setFormDescription] = useState("");
   const [formDate, setFormDate] = useState("");
 
-  // Estados para exclusão
+  // Estados para exclusão de atividade
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
     null
   );
+
+  // Estados para criação de atividade
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createFormName, createSetFormName] = useState("");
+  const [createFormDescription, createSetFormDescription] = useState("");
+  const [createFormDate, createSetFormDate] = useState("");
 
   const requestDeleteActivity = (activity: Activity) => {
     setActivityToDelete(activity);
@@ -105,6 +112,10 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     setEditDialogOpen(true);
   };
 
+  const handleOpenCreateDialog = () => {
+    setCreateDialogOpen(true);
+  };
+
   const handleUpdateActivity = async () => {
     if (!selectedActivity || !token) return;
 
@@ -127,6 +138,41 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       setEditDialogOpen(false);
     } else {
       alert("Falha ao atualizar atividade.");
+    }
+  };
+
+  const handleCreateActivity = async () => {
+    if (!token) return;
+
+    if (!createFormName || !createFormDescription || !createFormDate) {
+      alert("Preencha todos os campos antes de criar a atividade.");
+      return;
+    }
+
+    const activityData = {
+      name: createFormName,
+      description: createFormDescription,
+      date: createFormDate,
+    };
+
+    try {
+      const activity = await activityService.createActivity(
+        id,
+        token,
+        activityData
+      );
+
+      if (!activity) {
+        alert("Falha ao criar a atividade. Verifique os dados informados.");
+        return;
+      }
+
+      setActivities((prev) => [...prev, activity]);
+
+      setCreateDialogOpen(false);
+    } catch (error) {
+      console.error("Erro ao criar a atividade: " + error);
+      alert("Erro ao criar a atividade. Tente novamente.");
     }
   };
 
@@ -214,7 +260,10 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
                   onDelete={() => requestDeleteActivity(activity)}
                 />
               ))}
-              <Button variant={"outline"}>
+              <Button
+                onClick={() => handleOpenCreateDialog()}
+                variant={"outline"}
+              >
                 Criar atividade
                 <PlusCircleIcon />{" "}
               </Button>
@@ -225,47 +274,32 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
 
       {/* Dialog de edição */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Atividade</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Descrição</Label>
-              <Input
-                id="description"
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="date">Data</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formDate}
-                onChange={(e) => setFormDate(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="secondary"
-              onClick={() => setEditDialogOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={handleUpdateActivity}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
+        <ActivityDialogContent
+          tipo="Editar"
+          formName={formName}
+          formDescription={formDescription}
+          formDate={formDate}
+          setFormName={setFormName}
+          setFormDescription={setFormDescription}
+          setFormDate={setFormDate}
+          onCancel={() => setEditDialogOpen(false)}
+          onSave={handleUpdateActivity}
+        />
+      </Dialog>
+
+      {/* Dialog de criação */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <ActivityDialogContent
+          tipo="Criar"
+          formName={createFormName}
+          formDescription={createFormDescription}
+          formDate={createFormDate}
+          setFormName={createSetFormName}
+          setFormDescription={createSetFormDescription}
+          setFormDate={createSetFormDate}
+          onCancel={() => setCreateDialogOpen(false)}
+          onSave={handleCreateActivity}
+        />
       </Dialog>
 
       {/* AlertDialog de exclusão */}
