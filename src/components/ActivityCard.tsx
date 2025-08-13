@@ -1,13 +1,30 @@
 import { Edit2Icon, TrashIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
+import { parseISO, format } from "date-fns";
 
 interface ActivityData {
   name: string;
   description: string;
-  date: string;
+  date: string; // ISO como "YYYY-MM-DD" ou "YYYY-MM-DDTHH:mm:ssZ"
   onEdit?: () => void;
   onDelete?: () => void;
+}
+
+function formatDateSafe(input: string): string {
+  if (!input) return "";
+
+  const match = input.match(/^\d{4}-\d{2}-\d{2}/);
+  if (match) {
+    const [y, m, d] = match[0].split("-");
+    return `${d}/${m}/${y}`;
+  }
+
+  try {
+    return format(parseISO(input), "dd/MM/yyyy");
+  } catch {
+    return input;
+  }
 }
 
 function ActivityCard({
@@ -32,9 +49,7 @@ function ActivityCard({
           </div>
         </div>
         <p className="text-muted-foreground">{description}</p>
-        <p className="text-muted-foreground">
-          {new Date(date).toLocaleDateString()}
-        </p>
+        <p className="text-muted-foreground">{formatDateSafe(date)}</p>
       </CardContent>
     </Card>
   );
