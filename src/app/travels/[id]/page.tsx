@@ -5,21 +5,13 @@ import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { activityService } from "@/services/activityService";
 import { inviteService } from "@/services/inviteService";
 import { travelService } from "@/services/travelService";
 import { useAuthStore } from "@/stores/authStore";
-import { PlaneLanding, PlaneTakeoff, PlusCircleIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import TravelTitle from "@/components/TravelTitle";
 import { ActivityDialogContent } from "@/components/ActivityDialogContent";
+import React from "react";
 
 interface Travel {
   id: string;
@@ -41,9 +34,7 @@ interface Travel {
 }
 
 interface TravelDetailProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 interface Activity {
@@ -54,7 +45,7 @@ interface Activity {
 }
 
 const TravelDetail = ({ params }: TravelDetailProps) => {
-  const { id } = params;
+  const { id } = React.use(params);
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
   const [invites, setInvites] = useState<string[]>([]);
