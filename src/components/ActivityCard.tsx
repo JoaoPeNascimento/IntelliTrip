@@ -20,13 +20,13 @@ function ActivityCard({
   return (
     <Card className="border-solid border-gray-300 max-w-[370px]">
       <CardContent>
-        <div className="flex place-content-between">
+        <div className="flex justify-between items-center">
           <h1 className="font-semibold text-xl">{name}</h1>
-          <div className="gap-1">
-            <Button variant={"ghost"} onClick={onEdit}>
+          <div className="flex gap-1">
+            <Button variant="ghost" onClick={onEdit}>
               <Edit2Icon />
             </Button>
-            <Button variant={"ghost"} onClick={onDelete}>
+            <Button variant="ghost" onClick={onDelete}>
               <TrashIcon className="text-red-600" />
             </Button>
           </div>

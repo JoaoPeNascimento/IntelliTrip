@@ -12,5 +12,6 @@ export const activitySchema = activityCreateSchema.extend({
 
 export const activityUpdateSchema = activityCreateSchema.partial();
 
+export type ActivityUpdate = z.infer<typeof activityUpdateSchema>;
 export type ActivityCreate = z.infer<typeof activityCreateSchema>;
 export type Activity = z.infer<typeof activitySchema>;
