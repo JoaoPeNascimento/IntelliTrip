@@ -36,4 +36,26 @@ export const travelService = {
 
     return result;
   },
+
+  async createTravel(token: string) {
+    try {
+      const response = await fetch(`${apiUrl}/travel`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erro ao buscar viagem.");
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Erro ao criar a viagem: " + error);
+    }
+  },
 };

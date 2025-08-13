@@ -147,6 +147,10 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
                   onDelete={() => deleteActivity(activity.id, token)}
                 />
               ))}
+              <Button variant={"outline"}>
+                Criar atividade
+                <PlusCircleIcon />{" "}
+              </Button>
             </div>
           </div>
         </>

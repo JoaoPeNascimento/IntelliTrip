@@ -10,5 +10,7 @@ export const activitySchema = activityCreateSchema.extend({
   id: z.cuid("ID inválido"),
 });
 
+export const activityUpdateSchema = activityCreateSchema.partial();
+
 export type ActivityCreate = z.infer<typeof activityCreateSchema>;
 export type Activity = z.infer<typeof activitySchema>;

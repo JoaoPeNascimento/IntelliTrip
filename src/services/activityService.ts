@@ -3,6 +3,7 @@ import {
   activityCreateSchema,
   Activity,
   ActivityCreate,
+  activityUpdateSchema,
 } from "@/schemas/activitySchema";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -98,6 +99,44 @@ export const activityService = {
     } catch (error) {
       console.error("Erro ao deletar atividade:", error);
       return false;
+    }
+  },
+
+  async updateActivity(
+    activityId: string,
+    token: string,
+    data: Partial<ActivityCreate>
+  ): Promise<Activity | undefined> {
+    try {
+      const parsedData = activityUpdateSchema.parse(data);
+
+      const response = await fetch(`${apiUrl}/activity/${activityId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(parsedData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao atualizar atividade: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      const parsedResult = activitySchema.safeParse(result);
+      if (!parsedResult.success) {
+        console.error(
+          "Resposta inválida da API ao atualizar atividade:",
+          parsedResult.error
+        );
+        return;
+      }
+
+      return parsedResult.data;
+    } catch (error) {
+      console.error("Erro ao atualizar atividade:", error);
     }
   },
 };
