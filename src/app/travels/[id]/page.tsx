@@ -25,6 +25,8 @@ import {
 import TravelTitle from "@/components/TravelTitle";
 import { ActivityDialogContent } from "@/components/ActivityDialogContent";
 import React from "react";
+import InvitesSection from "@/components/InvitesSection";
+import ActivitiesSection from "@/components/ActivitiesSection";
 
 interface Travel {
   id: string;
@@ -226,39 +228,14 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               endDate={travelData.endDate}
             />
 
-            <Title>Convidados</Title>
-            <div className="space-y-1">
-              {invites.map((invite) => (
-                <p className="text-gray-500" key={invite}>
-                  {invite}
-                </p>
-              ))}
-              <Button variant={"outline"}>
-                Criar convite
-                <PlusCircleIcon />{" "}
-              </Button>
-            </div>
+            <InvitesSection invites={invites} />
 
-            <Title>Atividades</Title>
-            <div className="space-y-2">
-              {activities.map((activity) => (
-                <ActivityCard
-                  key={activity.id}
-                  name={activity.name}
-                  description={activity.description}
-                  date={activity.date}
-                  onEdit={() => handleOpenEditDialog(activity)}
-                  onDelete={() => requestDeleteActivity(activity)}
-                />
-              ))}
-              <Button
-                onClick={() => handleOpenCreateDialog()}
-                variant={"outline"}
-              >
-                Criar atividade
-                <PlusCircleIcon />{" "}
-              </Button>
-            </div>
+            <ActivitiesSection
+              activities={activities}
+              handleOpenCreateDialog={handleOpenCreateDialog}
+              onDelete={requestDeleteActivity}
+              onEdit={handleOpenEditDialog}
+            />
           </div>
         </>
       )}
