@@ -34,29 +34,22 @@ export const inviteService = {
   },
 
   async createInvite(
-    travelId: string,
     token: string,
-    data: Invite
-  ): Promise<Invite | undefined> {
-    try {
-      const response = await fetch(`${apiUrl}/invite/${travelId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+    data: { travelId: string; recieverEmail: string }
+  ) {
+    const response = await fetch(`${apiUrl}/invite`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Erro ao criar convite: " + result.error);
-      }
-
-      return result;
-    } catch (error) {
-      console.error("Erro ao criar convites:", error);
+    if (!response.ok) {
+      throw new Error("Erro ao criar o convite.");
     }
+
+    return response.json();
   },
 };

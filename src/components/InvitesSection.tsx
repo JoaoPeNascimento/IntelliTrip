@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, PlusCircleIcon } from "lucide-react";
+import { ChevronDown, ListCollapseIcon, PlusCircleIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Title from "./Title";
 import {

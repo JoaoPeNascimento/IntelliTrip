@@ -86,6 +86,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
 
   // Estados para criação de convite
   const [createInviteDialogOpen, setCreateInviteDialogOpen] = useState(false);
+  const [formEmail, setFormEmail] = useState("");
 
   const requestDeleteActivity = (activity: Activity) => {
     setActivityToDelete(activity);
@@ -146,6 +147,37 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       setEditDialogOpen(false);
     } else {
       alert("Falha ao atualizar atividade.");
+    }
+  };
+
+  const handleCreateInvite = async () => {
+    if (!token) return;
+
+    if (!formEmail) {
+      alert("Preencha o email para enviar o convite.");
+      return;
+    }
+
+    const inviteData = {
+      travelId: id,
+      recieverEmail: formEmail,
+    };
+
+    try {
+      const invite = await inviteService.createInvite(token, inviteData);
+
+      if (!invite) {
+        alert("Falha ao criar o convite. Verifique os dados informados.");
+        return;
+      }
+
+      setInvites((prev) => [...prev, invite.recieverEmail]);
+
+      setCreateInviteDialogOpen(false);
+      setFormEmail("");
+    } catch (error) {
+      console.error("Erro ao criar o convite:", error);
+      alert("Erro ao criar o convite. Tente novamente.");
     }
   };
 
@@ -322,7 +354,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
           </DialogHeader>
           <div className="space-y-1">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" />
+            <Input id="email" onChange={(e) => setFormEmail(e.target.value)} />
           </div>
           <DialogFooter>
             <Button
@@ -331,7 +363,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
             >
               Cancelar
             </Button>
-            <Button>Enviar Convite</Button>
+            <Button onClick={handleCreateInvite}>Enviar Convite</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
