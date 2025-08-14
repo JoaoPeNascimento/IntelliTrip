@@ -11,7 +11,13 @@ import { travelService } from "@/services/travelService";
 import { useAuthStore } from "@/stores/authStore";
 import { PlusCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Dialog } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +33,8 @@ import { ActivityDialogContent } from "@/components/ActivityDialogContent";
 import React from "react";
 import InvitesSection from "@/components/InvitesSection";
 import ActivitiesSection from "@/components/ActivitiesSection";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface Travel {
   id: string;
@@ -76,6 +84,9 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const [createFormDescription, createSetFormDescription] = useState("");
   const [createFormDate, createSetFormDate] = useState("");
 
+  // Estados para criação de convite
+  const [createInviteDialogOpen, setCreateInviteDialogOpen] = useState(false);
+
   const requestDeleteActivity = (activity: Activity) => {
     setActivityToDelete(activity);
     setDeleteDialogOpen(true);
@@ -101,8 +112,12 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     setSelectedActivity(activity);
     setFormName(activity.name);
     setFormDescription(activity.description);
-    setFormDate(activity.date.split("T")[0]); // formato para input date
+    setFormDate(activity.date.split("T")[0]);
     setEditDialogOpen(true);
+  };
+
+  const handleOpenCreateInviteDialog = () => {
+    setCreateInviteDialogOpen(true);
   };
 
   const handleOpenCreateDialog = () => {
@@ -228,7 +243,10 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               endDate={travelData.endDate}
             />
 
-            <InvitesSection invites={invites} />
+            <InvitesSection
+              invites={invites}
+              onClick={handleOpenCreateInviteDialog}
+            />
 
             <ActivitiesSection
               activities={activities}
@@ -293,6 +311,30 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={createInviteDialogOpen}
+        onOpenChange={setCreateInviteDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enviar Convite</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setCreateInviteDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button>Enviar Convite</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

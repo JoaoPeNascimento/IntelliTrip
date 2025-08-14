@@ -38,7 +38,7 @@ export function ActivityDialogContent({
         <DialogTitle>{tipo} Atividade</DialogTitle>
       </DialogHeader>
       <div className="space-y-4">
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="name">Nome</Label>
           <Input
             id="name"
@@ -46,7 +46,7 @@ export function ActivityDialogContent({
             onChange={(e) => setFormName(e.target.value)}
           />
         </div>
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="description">Descrição</Label>
           <Input
             id="description"
@@ -54,7 +54,7 @@ export function ActivityDialogContent({
             onChange={(e) => setFormDescription(e.target.value)}
           />
         </div>
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="date">Data</Label>
           <Input
             id="date"
