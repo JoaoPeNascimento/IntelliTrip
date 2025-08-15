@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ListCollapseIcon, PlusCircleIcon } from "lucide-react";
+import { ChevronDown, PlusCircleIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Title from "./Title";
 import {
@@ -10,12 +10,17 @@ import {
 } from "./ui/collapsible";
 import { useState } from "react";
 
-interface InviteList {
-  invites: string[];
+interface Invite {
+  id: string;
+  recieverEmail: string;
+}
+
+interface InvitesSectionProps {
+  invites: Invite[];
   onClick: () => void;
 }
 
-const InvitesSection = ({ invites, onClick }: InviteList) => {
+const InvitesSection = ({ invites, onClick }: InvitesSectionProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,11 +36,11 @@ const InvitesSection = ({ invites, onClick }: InviteList) => {
       <CollapsibleContent>
         <div className="space-y-1">
           {invites.map((invite) => (
-            <p className="text-gray-500" key={invite}>
-              {invite}
+            <p className="text-gray-500" key={invite.id}>
+              {invite.recieverEmail}
             </p>
           ))}
-          <Button variant={"outline"} onClick={onClick}>
+          <Button variant="outline" onClick={onClick}>
             Criar convite
             <PlusCircleIcon />{" "}
           </Button>

@@ -54,11 +54,16 @@ interface Activity {
   date: string;
 }
 
+interface Invite {
+  id: string;
+  recieverEmail: string;
+}
+
 const TravelDetail = ({ params }: TravelDetailProps) => {
   const { id } = React.use(params);
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
-  const [invites, setInvites] = useState<string[]>([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -171,9 +176,10 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
         return;
       }
 
-      setInvites((prev) => [...prev, invite.recieverEmail]);
+      setInvites((prev) => [...prev, invite]);
 
       setCreateInviteDialogOpen(false);
+      fetchInvites();
       setFormEmail("");
     } catch (error) {
       console.error("Erro ao criar o convite:", error);
@@ -216,6 +222,22 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     }
   };
 
+  const fetchInvites = async () => {
+    if (!token) return;
+    try {
+      const emails: string[] = await inviteService.getInvitesByTrip(id, token);
+
+      const invites: Invite[] = emails.map((email) => ({
+        id: email,
+        recieverEmail: email,
+      }));
+
+      setInvites(invites);
+    } catch (error) {
+      console.error("Erro ao buscar convites: " + error);
+    }
+  };
+
   useEffect(() => {
     const travelFetch = async () => {
       if (!token) return;
@@ -224,16 +246,6 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
         setTravel(travel);
       } catch (error) {
         console.error("Erro ao buscar dados da viagem: " + error);
-      }
-    };
-
-    const fetchInvites = async () => {
-      if (!token) return;
-      try {
-        const invites = await inviteService.getInvitesByTrip(id, token);
-        setInvites(invites);
-      } catch (error) {
-        console.error("Erro ao buscar convites: " + error);
       }
     };
 
