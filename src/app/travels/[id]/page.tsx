@@ -35,6 +35,7 @@ import InvitesSection from "@/components/InvitesSection";
 import ActivitiesSection from "@/components/ActivitiesSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { iaService } from "@/services/aiService";
 
 interface Travel {
   id: string;
@@ -92,6 +93,33 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   // Estados para criação de convite
   const [createInviteDialogOpen, setCreateInviteDialogOpen] = useState(false);
   const [formEmail, setFormEmail] = useState("");
+
+  // Estados para sugestão
+  const [suggestionDialogOpen, setSuggestionDialogOpen] = useState(false);
+  const [suggestionText, setSuggestionText] = useState("");
+
+  const handleGetSuggestions = async () => {
+    if (!token) return;
+    if (!travelData) return;
+
+    try {
+      const data = await iaService.getRecommendations(token, {
+        destination: travelData.destination,
+        startDate: travelData.startDate,
+        endDate: travelData.endDate,
+      });
+
+      if (data) {
+        setSuggestionText(data.recommendations);
+        setSuggestionDialogOpen(true);
+      } else {
+        alert(data.error || "Erro ao buscar sugestões");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erro na requisição de sugestões.");
+    }
+  };
 
   const requestDeleteActivity = (activity: Activity) => {
     setActivityToDelete(activity);
@@ -249,6 +277,25 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       }
     };
 
+    const fetchInvites = async () => {
+      if (!token) return;
+      try {
+        const emails: string[] = await inviteService.getInvitesByTrip(
+          id,
+          token
+        );
+
+        const invites: Invite[] = emails.map((email) => ({
+          id: email,
+          recieverEmail: email,
+        }));
+
+        setInvites(invites);
+      } catch (error) {
+        console.error("Erro ao buscar convites: " + error);
+      }
+    };
+
     const fetchActivities = async () => {
       if (!token) return;
       try {
@@ -297,6 +344,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               handleOpenCreateDialog={handleOpenCreateDialog}
               onDelete={requestDeleteActivity}
               onEdit={handleOpenEditDialog}
+              onSugest={handleGetSuggestions}
             />
           </div>
         </>
@@ -376,6 +424,23 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               Cancelar
             </Button>
             <Button onClick={handleCreateInvite}>Enviar Convite</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={suggestionDialogOpen}
+        onOpenChange={setSuggestionDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sugestões de Atividades</DialogTitle>
+          </DialogHeader>
+          <p>{suggestionText}</p>
+          <DialogFooter>
+            <Button onClick={() => setSuggestionDialogOpen(false)}>
+              Fechar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -15,6 +15,7 @@ interface ActivityList {
   onEdit: (activity: Activity) => void;
   onDelete: (activity: Activity) => void;
   handleOpenCreateDialog: () => void;
+  onSugest: () => void;
 }
 
 const ActivitiesSection = ({
@@ -22,10 +23,25 @@ const ActivitiesSection = ({
   onDelete,
   onEdit,
   handleOpenCreateDialog,
+  onSugest,
 }: ActivityList) => {
   return (
     <>
-      <Title>Atividades</Title>
+      <div className="flex items-baseline justify-between mb-2">
+        <Title>Atividades</Title>
+        <span
+          className="inline-block rounded-lg p-[2px] transition-colors bg-gray-200
+                   hover:bg-gradient-to-r hover:from-blue-500 hover:to-teal-400"
+        >
+          <Button
+            variant="outline"
+            onClick={onSugest}
+            className="rounded-lg border-2 border-transparent bg-white hover:bg-white hover:text-black"
+          >
+            Sugestões
+          </Button>
+        </span>
+      </div>
       <div className="space-y-2">
         {activities.map((activity) => (
           <ActivityCard

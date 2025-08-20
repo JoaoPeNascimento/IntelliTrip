@@ -10,6 +10,16 @@ import Title from "@/components/Title";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { travelService } from "@/services/travelService";
 import TravelCard from "@/components/TravelCard";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface Travel {
   id: string;
@@ -27,6 +37,47 @@ export default function Perfil() {
     name: string;
     email: string;
   } | null>(null);
+
+  // Estados para criação de viagem
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createFormDestination, createSetFormDestination] = useState("");
+  const [createFormStartDate, createSetFormStartDate] = useState("");
+  const [createFormEndDate, createSetFormEndDate] = useState("");
+
+  const handleOpenCreateDialog = () => {
+    setCreateDialogOpen(true);
+  };
+
+  const handleCreateTrip = async () => {
+    if (!token) return;
+
+    if (!createFormDestination || !createFormStartDate || !createFormEndDate) {
+      alert("Preencha todos os campos antes de criar a viagem.");
+      return;
+    }
+
+    const TripData = {
+      destination: createFormDestination,
+      startDate: createFormStartDate,
+      endDate: createFormEndDate,
+    };
+
+    try {
+      const travel = await travelService.createTravel(token, TripData);
+
+      if (!travel) {
+        alert("Falha ao criar a viagem. Verifique os dados informados.");
+        return;
+      }
+
+      setTravels((prev) => [...prev, travel]);
+
+      setCreateDialogOpen(false);
+    } catch (error) {
+      console.error("Erro ao criar a atividade: " + error);
+      alert("Erro ao criar a atividade. Tente novamente.");
+    }
+  };
 
   useEffect(() => {
     const userFetchData = async () => {
@@ -94,12 +145,68 @@ export default function Perfil() {
                   key={travel.id}
                 />
               ))}
+              <Button onClick={handleOpenCreateDialog} variant={"outline"}>
+                Planejar Nova Viagem
+              </Button>
             </div>
           </div>
 
           {/* Adicionar um footer */}
         </div>
       )}
+
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Planejar Nova Viagem</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="name">Destino</Label>
+              <Input
+                id="name"
+                value={createFormDestination}
+                onChange={(e) => {
+                  createSetFormDestination(e.target.value);
+                }}
+              />
+            </div>
+            <div className="space-y-1 flex place-content-between">
+              <div>
+                <Label htmlFor="date">Data Inicio</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={createFormStartDate}
+                  onChange={(e) => {
+                    createSetFormStartDate(e.target.value);
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="date">Data Fim</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={createFormEndDate}
+                  onChange={(e) => {
+                    createSetFormEndDate(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setCreateDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateTrip}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
