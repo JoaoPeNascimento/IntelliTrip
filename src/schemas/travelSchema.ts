@@ -21,8 +21,10 @@ export const activitySchema = z.object({
 });
 
 export const inviteSchema = z.object({
-  id: z.cuid("ID inválido"),
-  recieverEmail: z.email("E-mail inválido"),
+  id: z.string(),
+  recieverEmail: z.email().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const travelWithDetailsSchema = travelSchema.extend({
