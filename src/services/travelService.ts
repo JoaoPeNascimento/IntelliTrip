@@ -4,6 +4,8 @@ import {
   TravelCreate,
   travelCreateSchema,
   travelSchema,
+  TravelWithDetails,
+  travelWithDetailsSchema,
 } from "@/schemas/travelSchema";
 
 export const travelService = {
@@ -79,5 +81,29 @@ export const travelService = {
     } catch (error) {
       console.error("Erro ao criar a viagem: " + error);
     }
+  },
+
+  async getTravelWithDetails(travelId: string): Promise<TravelWithDetails> {
+    const response = await fetch(`${apiUrl}/travel/invite/${travelId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao buscar detalhes da viagem.");
+    }
+
+    const parsed = travelWithDetailsSchema.safeParse(result);
+
+    if (!parsed.success) {
+      console.error("Resposta inválida da API:", parsed.error);
+      throw new Error("Resposta inválida da API.");
+    }
+
+    return parsed.data;
   },
 };

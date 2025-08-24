@@ -1,15 +1,12 @@
 "use client";
 
-import ActivityCard from "@/components/ActivityCard";
 import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import Title from "@/components/Title";
 import { Button } from "@/components/ui/button";
 import { activityService } from "@/services/activityService";
 import { inviteService } from "@/services/inviteService";
 import { travelService } from "@/services/travelService";
 import { useAuthStore } from "@/stores/authStore";
-import { PlusCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Dialog,
