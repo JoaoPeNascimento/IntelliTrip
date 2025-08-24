@@ -19,8 +19,8 @@ const TravelInvite = ({ params }: TravelDetailProps) => {
       try {
         const data = await travelService.getTravelWithDetails(id);
         setTravel(data);
-      } catch (err: any) {
-        setError(err.message || "Erro ao carregar viagem");
+      } catch (error) {
+        setError("Erro ao carregar viagem" + error);
       } finally {
         setLoading(false);
       }
