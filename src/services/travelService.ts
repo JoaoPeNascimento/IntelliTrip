@@ -4,9 +4,11 @@ import {
   TravelCreate,
   travelCreateSchema,
   travelSchema,
+} from "@/schemas/travelSchema";
+import {
   TravelWithDetails,
   travelWithDetailsSchema,
-} from "@/schemas/travelSchema";
+} from "@/schemas/travelWithDetails";
 
 export const travelService = {
   async getAllTravels(token: string) {
@@ -101,6 +103,7 @@ export const travelService = {
 
     if (!parsed.success) {
       console.error("Resposta inválida da API:", parsed.error);
+      console.error("Payload recebido:", result);
       throw new Error("Resposta inválida da API.");
     }
 
