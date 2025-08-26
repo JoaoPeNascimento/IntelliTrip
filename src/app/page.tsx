@@ -40,8 +40,9 @@ export default function Cadastro() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md shadow-xl p-6">
         <CardContent>
-          <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">
-            Bem-vindo ao IntelliTrip
+          <h1 className="text-2xl font-bold text-center mb-6 ">
+            Bem-vindo ao Intelli
+            <span className="text-2xl font-bold text-blue-600">Trip</span>
           </h1>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">

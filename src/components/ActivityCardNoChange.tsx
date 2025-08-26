@@ -1,5 +1,3 @@
-import { Edit2Icon, TrashIcon } from "lucide-react";
-import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { parseISO, format } from "date-fns";
 
@@ -25,7 +23,7 @@ function formatDateSafe(input: string): string {
   }
 }
 
-function ActivityCard({ name, description, date }: ActivityData) {
+function ActivityCardNoChange({ name, description, date }: ActivityData) {
   return (
     <Card className="border-solid border-gray-300 max-w-[370px]">
       <CardContent>
@@ -39,4 +37,4 @@ function ActivityCard({ name, description, date }: ActivityData) {
   );
 }
 
-export default ActivityCard;
+export default ActivityCardNoChange;

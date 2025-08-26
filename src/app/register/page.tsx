@@ -24,11 +24,9 @@ export default function Cadastro() {
 
   const onSubmit = async (data: RegistroSchema) => {
     try {
-      const result = await authService.register(data);
+      await authService.register(data);
 
-      useAuthStore.getState().setToken(result.token, result.userId);
-
-      router.push("/home");
+      router.push("/");
     } catch (error) {
       console.error("Erro ao registrar:", error);
       alert("Falha ao registrar: " + (error as Error).message);
@@ -39,8 +37,9 @@ export default function Cadastro() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md shadow-xl p-6">
         <CardContent>
-          <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">
-            Crie sua conta no IntelliTrip
+          <h1 className="text-2xl font-bold text-center mb-6">
+            Crie sua conta no Intelli
+            <span className="text-2xl font-bold text-blue-600">Trip</span>
           </h1>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">

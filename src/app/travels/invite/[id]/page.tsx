@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/collapsible";
 import Title from "@/components/Title";
 import { ChevronDown } from "lucide-react";
-import ActivityCard from "@/components/ActivityCardNoChange";
 import ActivityCardNoChange from "@/components/ActivityCardNoChange";
 
 interface TravelDetailProps {
