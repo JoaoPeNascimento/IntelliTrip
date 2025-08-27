@@ -33,6 +33,8 @@ import ActivitiesSection from "@/components/ActivitiesSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { iaService } from "@/services/aiService";
+import { toast } from "sonner";
+import { CircleCheckBig } from "lucide-react";
 
 interface Travel {
   id: string;
@@ -132,8 +134,16 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     );
     if (success) {
       setActivities((prev) => prev.filter((a) => a.id !== activityToDelete.id));
+      toast.custom(() => (
+        <div>
+          <div className="flex border border-gray-300 rounded-xl p-2">
+            <p>Atividade deletada com sucesso!</p>
+            <CircleCheckBig />
+          </div>
+        </div>
+      ));
     } else {
-      alert("Falha ao deletar atividade.");
+      toast.error("Erro ao deletar a ativade. Tente novamente!");
     }
     setLoading(false);
     setDeleteDialogOpen(false);
@@ -175,6 +185,14 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
         prev.map((a) => (a.id === updated.id ? updated : a))
       );
       setEditDialogOpen(false);
+      toast.custom(() => (
+        <div>
+          <div className="flex border border-gray-300 rounded-xl p-2">
+            <p>Atividade atualizada com sucesso!</p>
+            <CircleCheckBig />
+          </div>
+        </div>
+      ));
     } else {
       alert("Falha ao atualizar atividade.");
     }
@@ -194,6 +212,9 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     };
 
     try {
+      setCreateInviteDialogOpen(false);
+      setLoading(true);
+      setShowSpinner(true);
       const invite = await inviteService.createInvite(token, inviteData);
 
       if (!invite) {
@@ -203,9 +224,19 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
 
       setInvites((prev) => [...prev, invite]);
 
-      setCreateInviteDialogOpen(false);
       fetchInvites();
       setFormEmail("");
+      setLoading(false);
+      setShowSpinner(false);
+
+      toast.custom(() => (
+        <div>
+          <div className="flex border border-gray-300 rounded-xl p-2">
+            <p>Convite enviado com sucesso!</p>
+            <CircleCheckBig />
+          </div>
+        </div>
+      ));
     } catch (error) {
       console.error("Erro ao criar o convite:", error);
       alert("Erro ao criar o convite. Tente novamente.");
@@ -234,13 +265,21 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       );
 
       if (!activity) {
-        alert("Falha ao criar a atividade. Verifique os dados informados.");
+        toast.error("Falha ao criar atividade. Tente novamente!");
         return;
       }
 
       setActivities((prev) => [...prev, activity]);
 
       setCreateDialogOpen(false);
+      toast.custom(() => (
+        <div>
+          <div className="flex border border-gray-300 rounded-xl p-2">
+            <p>Atividade criada com sucesso!</p>
+            <CircleCheckBig />
+          </div>
+        </div>
+      ));
     } catch (error) {
       console.error("Erro ao criar a atividade: " + error);
       alert("Erro ao criar a atividade. Tente novamente.");

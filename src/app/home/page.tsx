@@ -25,11 +25,12 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { CircleCheckBig } from "lucide-react";
 
 interface Travel {
   id: string;
@@ -108,7 +109,12 @@ export default function Perfil() {
       );
       setDeleteDialogOpen(false);
       setSelectedTravelId(null);
-      alert("Viagem excluída com sucesso!");
+      toast.custom(() => (
+        <div className="flex border border-gray-300 rounded-xl p-2">
+          <p>Viagem deletada com sucesso</p>
+          <CircleCheckBig />
+        </div>
+      ));
     } catch (error) {
       console.error("Erro ao deletar viagem:", error);
       alert("Falha ao excluir a viagem. Tente novamente.");
@@ -256,7 +262,10 @@ export default function Perfil() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>

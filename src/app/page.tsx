@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { CircleCheckBig } from "lucide-react";
 
 export default function Cadastro() {
   const router = useRouter();
@@ -34,6 +36,16 @@ export default function Cadastro() {
       console.error("Erro ao realizar login:", error);
       alert("Falha ao realizar login: " + (error as Error).message);
     }
+
+    toast.custom(() => (
+      <div>
+        <p>Bem-vindo!</p>
+        <div className="flex border border-gray-300 rounded-xl p-2">
+          <p>Login realizado com sucesso!</p>
+          <CircleCheckBig />
+        </div>
+      </div>
+    ));
   };
 
   return (
