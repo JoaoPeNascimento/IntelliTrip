@@ -20,6 +20,16 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Travel {
   id: string;
@@ -43,6 +53,15 @@ export default function Perfil() {
   const [createFormDestination, createSetFormDestination] = useState("");
   const [createFormStartDate, createSetFormStartDate] = useState("");
   const [createFormEndDate, createSetFormEndDate] = useState("");
+
+  //Estados para exclusão de viagem
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedTravelId, setSelectedTravelId] = useState<string | null>(null);
+
+  const openDeleteDialog = (travelId: string) => {
+    setSelectedTravelId(travelId);
+    setDeleteDialogOpen(true);
+  };
 
   const handleOpenCreateDialog = () => {
     setCreateDialogOpen(true);
@@ -76,6 +95,23 @@ export default function Perfil() {
     } catch (error) {
       console.error("Erro ao criar a atividade: " + error);
       alert("Erro ao criar a atividade. Tente novamente.");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!token || !selectedTravelId) return;
+
+    try {
+      await travelService.deleteTravel(token, selectedTravelId);
+      setTravels((prev) =>
+        prev.filter((travel) => travel.id !== selectedTravelId)
+      );
+      setDeleteDialogOpen(false);
+      setSelectedTravelId(null);
+      alert("Viagem excluída com sucesso!");
+    } catch (error) {
+      console.error("Erro ao deletar viagem:", error);
+      alert("Falha ao excluir a viagem. Tente novamente.");
     }
   };
 
@@ -143,6 +179,7 @@ export default function Perfil() {
                   endDate={travel.endDate}
                   id={travel.id}
                   key={travel.id}
+                  onDelete={() => openDeleteDialog(travel.id)}
                 />
               ))}
               <Button onClick={handleOpenCreateDialog} variant={"outline"}>
@@ -207,6 +244,24 @@ export default function Perfil() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
+            <p>
+              Tem certeza que deseja excluir esta viagem? Esta ação não pode ser
+              desfeita.
+            </p>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

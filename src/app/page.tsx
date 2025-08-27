@@ -85,6 +85,9 @@ export default function Cadastro() {
                 Fazer Registro.
               </Link>{" "}
             </p>
+            <Link href="/password" className="text-blue-600 hover:underline">
+              Esqueci a senha.
+            </Link>{" "}
           </div>
         </CardContent>
       </Card>

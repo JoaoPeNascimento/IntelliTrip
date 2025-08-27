@@ -85,6 +85,23 @@ export const travelService = {
     }
   },
 
+  deleteTravel: async (token: string, travelId: string) => {
+    const response = await fetch(`${apiUrl}/travel/${travelId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Erro ao deletar viagem");
+    }
+
+    return true;
+  },
+
   async getTravelWithDetails(travelId: string): Promise<TravelWithDetails> {
     const response = await fetch(`${apiUrl}/travel/invite/${travelId}`, {
       method: "GET",
