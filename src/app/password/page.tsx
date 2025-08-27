@@ -15,9 +15,10 @@ const Password = () => {
 
   const onSubmit = async (email: string) => {
     try {
-      const { exists } = await authService.checkEmail(email);
+      const { exists, token } = await authService.checkEmail(email);
 
-      if (exists) {
+      if (exists && token) {
+        useAuthStore.getState().setToken(token, "");
         setEmailGlobal(email);
         router.push("/password/change");
       } else {

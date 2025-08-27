@@ -26,12 +26,20 @@ interface UserData {
   email: string;
 }
 
-interface CheckEmailData {
-  email: string;
-}
-
 interface CheckEmailResponse {
   exists: boolean;
+  token?: string;
+}
+
+interface UpdateUserData {
+  name?: string;
+  password?: string;
+}
+
+interface UpdateUserResponse {
+  id: string;
+  name: string;
+  email: string;
 }
 
 export const authService = {
@@ -97,7 +105,7 @@ export const authService = {
     const response = await fetch(`${apiUrl}/auth/check-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email }),
+      body: JSON.stringify({ email }),
     });
 
     const result = await response.json();
@@ -106,6 +114,28 @@ export const authService = {
       throw new Error(result.error || "Erro ao verificar e-mail.");
     }
 
-    return result;
+    return result as CheckEmailResponse;
+  },
+
+  async updateUser(
+    data: UpdateUserData,
+    token: string
+  ): Promise<UpdateUserResponse> {
+    const response = await fetch(`${apiUrl}/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao atualizar usuário.");
+    }
+
+    return result as UpdateUserResponse;
   },
 };
