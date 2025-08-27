@@ -26,6 +26,14 @@ interface UserData {
   email: string;
 }
 
+interface CheckEmailData {
+  email: string;
+}
+
+interface CheckEmailResponse {
+  exists: boolean;
+}
+
 export const authService = {
   async register(data: RegisterData): Promise<RegisterResponse> {
     const response = await fetch(`${apiUrl}/auth/register`, {
@@ -83,5 +91,21 @@ export const authService = {
     }
 
     return result.userData;
+  },
+
+  async checkEmail(email: string): Promise<CheckEmailResponse> {
+    const response = await fetch(`${apiUrl}/auth/check-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao verificar e-mail.");
+    }
+
+    return result;
   },
 };
