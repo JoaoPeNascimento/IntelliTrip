@@ -49,6 +49,7 @@ export const inviteService = {
       return uniqueEmails;
     } catch (error) {
       console.error("Erro ao buscar convites:", error);
+      return [];
     }
   },
 
