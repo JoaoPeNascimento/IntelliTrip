@@ -12,7 +12,7 @@ import {
 
 export const travelService = {
   async getAllTravels(token: string) {
-    const response = await fetch(`${apiUrl}/travel`, {
+    const res = await fetch(`${apiUrl}/travel`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -20,9 +20,9 @@ export const travelService = {
       },
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao buscar viagens do usuário.");
     }
 
@@ -30,7 +30,7 @@ export const travelService = {
   },
 
   async getTravelById(travelId: string, token: string) {
-    const response = await fetch(`${apiUrl}/travel/${travelId}`, {
+    const res = await fetch(`${apiUrl}/travel/${travelId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -38,9 +38,9 @@ export const travelService = {
       },
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao buscar viagem.");
     }
 
@@ -54,7 +54,7 @@ export const travelService = {
     try {
       const parsedData = travelCreateSchema.parse(data);
 
-      const response = await fetch(`${apiUrl}/travel`, {
+      const res = await fetch(`${apiUrl}/travel`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,11 +63,11 @@ export const travelService = {
         body: JSON.stringify(parsedData),
       });
 
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error("Erro ao criar viagem.");
       }
 
-      const result = await response.json();
+      const result = await res.json();
 
       const parsedResult = travelSchema.safeParse(result);
 
@@ -86,7 +86,7 @@ export const travelService = {
   },
 
   deleteTravel: async (token: string, travelId: string) => {
-    const response = await fetch(`${apiUrl}/travel/${travelId}`, {
+    const res = await fetch(`${apiUrl}/travel/${travelId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -94,8 +94,8 @@ export const travelService = {
       },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
       throw new Error(errorData.message || "Erro ao deletar viagem");
     }
 
@@ -103,16 +103,16 @@ export const travelService = {
   },
 
   async getTravelWithDetails(travelId: string): Promise<TravelWithDetails> {
-    const response = await fetch(`${apiUrl}/travel/invite/${travelId}`, {
+    const res = await fetch(`${apiUrl}/travel/invite/${travelId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao buscar detalhes da viagem.");
     }
 

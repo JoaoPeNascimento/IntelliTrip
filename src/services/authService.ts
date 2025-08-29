@@ -44,7 +44,7 @@ interface UpdateUserResponse {
 
 export const authService = {
   async register(data: RegisterData): Promise<RegisterResponse> {
-    const response = await fetch(`${apiUrl}/auth/register`, {
+    const res = await fetch(`${apiUrl}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -54,9 +54,9 @@ export const authService = {
       }),
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro desconhecido.");
     }
 
@@ -64,7 +64,7 @@ export const authService = {
   },
 
   async login(data: LoginData): Promise<LoginResponse> {
-    const response = await fetch(`${apiUrl}/auth/login`, {
+    const res = await fetch(`${apiUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -73,9 +73,9 @@ export const authService = {
       }),
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       alert("Usuário não encontrado!");
       throw new Error(result.error || "Erro desconhecido.");
     }
@@ -84,7 +84,7 @@ export const authService = {
   },
 
   async getUser(token: string): Promise<UserData> {
-    const response = await fetch(`${apiUrl}/auth/user/`, {
+    const res = await fetch(`${apiUrl}/auth/user/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -92,9 +92,9 @@ export const authService = {
       },
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao buscar dados do usuário.");
     }
 
@@ -102,15 +102,15 @@ export const authService = {
   },
 
   async checkEmail(email: string): Promise<CheckEmailResponse> {
-    const response = await fetch(`${apiUrl}/auth/check-email`, {
+    const res = await fetch(`${apiUrl}/auth/check-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao verificar e-mail.");
     }
 
@@ -121,7 +121,7 @@ export const authService = {
     data: UpdateUserData,
     token: string
   ): Promise<UpdateUserResponse> {
-    const response = await fetch(`${apiUrl}/auth/update`, {
+    const res = await fetch(`${apiUrl}/auth/update`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -130,9 +130,9 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       throw new Error(result.error || "Erro ao atualizar usuário.");
     }
 

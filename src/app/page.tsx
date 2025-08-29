@@ -39,10 +39,12 @@ export default function Cadastro() {
 
     toast.custom(() => (
       <div>
-        <p>Bem-vindo!</p>
-        <div className="flex border border-gray-300 rounded-xl p-2">
-          <p>Login realizado com sucesso!</p>
-          <CircleCheckBig />
+        <div className="border border-gray-300 rounded-xl p-2">
+          <p>Bem-vindo!</p>
+          <div className="flex">
+            <p>Login realizado com sucesso!</p>
+            <CircleCheckBig />
+          </div>
         </div>
       </div>
     ));

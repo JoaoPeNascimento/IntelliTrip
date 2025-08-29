@@ -14,7 +14,7 @@ export const activityService = {
     token: string
   ): Promise<Activity[]> {
     try {
-      const response = await fetch(`${apiUrl}/activity/${travelId}`, {
+      const res = await fetch(`${apiUrl}/activity/${travelId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -22,24 +22,19 @@ export const activityService = {
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Erro: ${response.status}`);
+      if (!res.ok) {
+        throw new Error(`Erro: ${res.status}`);
       }
 
-      const data = await response.json();
+      const data = await res.json();
 
       const parsed = activitySchema.array().safeParse(data);
       if (!parsed.success) {
-        console.error(
-          "Erro de validação nas atividades recebidas:",
-          parsed.error
-        );
         return [];
       }
 
       return parsed.data;
     } catch (error) {
-      console.error("Erro ao buscar atividades:", error);
       return [];
     }
   },
@@ -52,7 +47,7 @@ export const activityService = {
     try {
       const parsedData = activityCreateSchema.parse(data);
 
-      const response = await fetch(`${apiUrl}/activity/${travelId}`, {
+      const res = await fetch(`${apiUrl}/activity/${travelId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,43 +56,38 @@ export const activityService = {
         body: JSON.stringify(parsedData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Erro: ${response.status}`);
+      if (!res.ok) {
+        throw new Error(`Erro: ${res.status}`);
       }
 
-      const result = await response.json();
+      const result = await res.json();
 
       const parsedResult = activitySchema.safeParse(result);
       if (!parsedResult.success) {
-        console.error(
-          "Resposta inválida da API ao criar atividade:",
-          parsedResult.error
-        );
         return;
       }
 
       return parsedResult.data;
     } catch (error) {
-      console.error("Erro ao criar atividade:", error);
+      return;
     }
   },
 
   async deleteActivity(activityId: string, token: string): Promise<boolean> {
     try {
-      const response = await fetch(`${apiUrl}/activity/${activityId}`, {
+      const res = await fetch(`${apiUrl}/activity/${activityId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Erro ao deletar atividade: ${response.status}`);
+      if (!res.ok) {
+        throw new Error(`Erro ao deletar atividade: ${res.status}`);
       }
 
       return true;
     } catch (error) {
-      console.error("Erro ao deletar atividade:", error);
       return false;
     }
   },
@@ -110,7 +100,7 @@ export const activityService = {
     try {
       const parsedData = activityUpdateSchema.parse(data);
 
-      const response = await fetch(`${apiUrl}/activity/${activityId}`, {
+      const res = await fetch(`${apiUrl}/activity/${activityId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -119,24 +109,20 @@ export const activityService = {
         body: JSON.stringify(parsedData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Erro ao atualizar atividade: ${response.status}`);
+      if (!res.ok) {
+        throw new Error(`Erro ao atualizar atividade: ${res.status}`);
       }
 
-      const result = await response.json();
+      const result = await res.json();
 
       const parsedResult = activitySchema.safeParse(result);
       if (!parsedResult.success) {
-        console.error(
-          "Resposta inválida da API ao atualizar atividade:",
-          parsedResult.error
-        );
         return;
       }
 
       return parsedResult.data;
     } catch (error) {
-      console.error("Erro ao atualizar atividade:", error);
+      return;
     }
   },
 };

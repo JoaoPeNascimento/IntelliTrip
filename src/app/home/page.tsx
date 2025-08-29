@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { CircleCheckBig } from "lucide-react";
+import { inviteService } from "@/services/inviteService";
+import { useUIStore } from "@/stores/uiStore";
 
 interface Travel {
   id: string;
@@ -39,11 +41,21 @@ interface Travel {
   endDate: string;
 }
 
+interface Invite {
+  id: string;
+  inviteId: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+}
+
 export default function Perfil() {
   const token = useAuthStore((state) => state.token);
+  const { showMyTravels, showMyInvites } = useUIStore();
   const [showSpinner, setShowSpinner] = useState(true);
   const [travels, setTravels] = useState<Travel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const [userData, setUserData] = useState<{
     name: string;
     email: string;
@@ -58,6 +70,15 @@ export default function Perfil() {
   //Estados para exclusão de viagem
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTravelId, setSelectedTravelId] = useState<string | null>(null);
+
+  //Estados para exclusão de convite
+  const [deleteInviteDialogOpen, setDeleteInviteDialogOpen] = useState(false);
+  const [selectedInviteId, setSelectedInviteId] = useState<string | null>(null);
+
+  const openDeleteInviteDialog = (inviteId: string) => {
+    setSelectedInviteId(inviteId);
+    setDeleteInviteDialogOpen(true);
+  };
 
   const openDeleteDialog = (travelId: string) => {
     setSelectedTravelId(travelId);
@@ -94,8 +115,28 @@ export default function Perfil() {
 
       setCreateDialogOpen(false);
     } catch (error) {
-      console.error("Erro ao criar a atividade: " + error);
       alert("Erro ao criar a atividade. Tente novamente.");
+    }
+  };
+
+  const handleConfirmDeleteInvite = async () => {
+    if (!token || !selectedInviteId) return;
+
+    try {
+      await inviteService.deleteInvite(token, selectedInviteId);
+      setInvites((prev) =>
+        prev.filter((invites) => invites.inviteId !== selectedInviteId)
+      );
+      setDeleteDialogOpen(false);
+      setSelectedTravelId(null);
+      toast.custom(() => (
+        <div className="flex border border-gray-300 rounded-xl p-2">
+          <p>Convite deletado com sucesso</p>
+          <CircleCheckBig />
+        </div>
+      ));
+    } catch (error) {
+      alert("Falha ao excluir o convite. Tente novamente.");
     }
   };
 
@@ -116,7 +157,6 @@ export default function Perfil() {
         </div>
       ));
     } catch (error) {
-      console.error("Erro ao deletar viagem:", error);
       alert("Falha ao excluir a viagem. Tente novamente.");
     }
   };
@@ -131,7 +171,18 @@ export default function Perfil() {
           email: user.email,
         });
       } catch (error) {
-        console.log("Erro ao buscar dados do usuário: " + error);
+        return;
+      }
+    };
+
+    const userInviteFetchData = async () => {
+      if (!token) return;
+      try {
+        const invites = await inviteService.getUserInvites(token);
+        if (!invites) return;
+        setInvites(invites);
+      } catch (error) {
+        return;
       }
     };
 
@@ -141,13 +192,18 @@ export default function Perfil() {
         const data = await travelService.getAllTravels(token);
         setTravels(data);
       } catch (error) {
-        console.log("Erro ao buscar viagens do usuário: " + error);
+        return;
       }
     };
 
     const loadWithDelay = async () => {
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-      await Promise.all([userFetchData(), travelsFetchData(), delay]);
+      await Promise.all([
+        userFetchData(),
+        travelsFetchData(),
+        userInviteFetchData(),
+        delay,
+      ]);
       setLoading(false);
       setShowSpinner(false);
     };
@@ -158,7 +214,7 @@ export default function Perfil() {
   return (
     <>
       <LoadingSpinner visible={showSpinner} />
-      {!showSpinner && userData && (
+      {!showSpinner && userData && showMyTravels && (
         <div>
           <Header />
           <div className="p-5">
@@ -183,8 +239,8 @@ export default function Perfil() {
                   destination={travel.destination}
                   startDate={travel.startDate}
                   endDate={travel.endDate}
-                  id={travel.id}
                   key={travel.id}
+                  url={`/travel/${travel.id}`}
                   onDelete={() => openDeleteDialog(travel.id)}
                 />
               ))}
@@ -193,16 +249,47 @@ export default function Perfil() {
               </Button>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Adicionar um footer */}
+      {!showSpinner && userData && showMyInvites && (
+        <div>
+          <Header />
+          <div className="p-5">
+            <div>
+              <h2 className="text-lg font-medium">
+                Olá, {userData.name} Bem-vindo!
+              </h2>
+              <p>
+                <span className="capitalize">
+                  {format(new Date(), "EEEE, dd", { locale: ptBR })}
+                </span>
+                <span>&nbsp;de&nbsp;</span>
+                <span className="capitalize">
+                  {format(new Date(), "MMMM", { locale: ptBR })}
+                </span>
+              </p>
+            </div>
+            <Title>Meus Convites</Title>
+            <div className="space-y-2">
+              {invites.map((invite) => (
+                <TravelCard
+                  destination={invite.destination}
+                  startDate={invite.startDate}
+                  endDate={invite.endDate}
+                  key={invite.id}
+                  url={`/travel/invite/${invite.id}`}
+                  onDelete={() => openDeleteInviteDialog(invite.inviteId)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Planejar Nova Viagem</DialogTitle>
-          </DialogHeader>
+          <DialogTitle>Planejar Nova Viagem</DialogTitle>
           <div className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="name">Destino</Label>
@@ -253,8 +340,8 @@ export default function Perfil() {
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
+          <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
             <p>
               Tem certeza que deseja excluir esta viagem? Esta ação não pode ser
               desfeita.
@@ -264,6 +351,30 @@ export default function Perfil() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteInviteDialogOpen}
+        onOpenChange={setDeleteInviteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir convite</AlertDialogTitle>
+            <p>
+              Tem certeza que deseja excluir este convite? Esta ação não pode
+              ser desfeita.
+            </p>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeleteInvite}
               className="bg-red-600 hover:bg-red-700"
             >
               Excluir

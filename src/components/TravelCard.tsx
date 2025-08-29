@@ -7,7 +7,7 @@ interface TravelData {
   destination: string;
   startDate: string;
   endDate: string;
-  id: string;
+  url: string;
   onDelete: () => void;
 }
 
@@ -15,7 +15,7 @@ const TravelCard = ({
   destination,
   startDate,
   endDate,
-  id,
+  url,
   onDelete,
 }: TravelData) => {
   return (
@@ -36,7 +36,7 @@ const TravelCard = ({
               className="capitalize p-1 rounded-xl whitespace-nowrap"
               asChild
             >
-              <Link href={`/travel/${id}`}>Ver detalhes</Link>
+              <Link href={url}>Ver detalhes</Link>
             </Button>
           </div>
         </div>

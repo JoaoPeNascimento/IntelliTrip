@@ -5,7 +5,7 @@ export const iaService = {
     token: string,
     data: { destination: string; startDate: string; endDate: string }
   ) {
-    const response = await fetch(`${apiUrl}/ia/recommendations`, {
+    const res = await fetch(`${apiUrl}/ia/recommendations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,12 +13,12 @@ export const iaService = {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      const err = await response.json();
+    if (!res.ok) {
+      const err = await res.json();
       throw new Error(err.error);
     }
 
-    const recommendations = await response.json();
+    const recommendations = await res.json();
     return recommendations;
   },
 };
