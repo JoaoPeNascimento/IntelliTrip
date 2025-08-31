@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IntelliTrip
 
-## Getting Started
+Este projeto é composto por dois repositórios principais: **IntelliTrip (Front-end)** e **Travel-Ai (Back-end)**.  
+Juntos, eles formam uma aplicação completa de **gestão de viagens**, com funcionalidades que integram convites por e-mail, criação de atividades, sugestões de IA e gerenciamento de participantes.
 
-First, run the development server:
+---
+
+## 🚀 IntelliTrip (Front-end)
+
+### Tecnologias utilizadas
+
+- **Next.js**
+- **TypeScript**
+- **Zod**
+- **Tailwind CSS**
+- **Shadn**
+
+### Funcionalidades
+
+- **Criar viagens**
+- Enviar **convites por e-mail** para viagens
+- Criar e gerenciar **atividades** durante a viagem
+- Receber **sugestões de IA** para o destino
+- Visualizar e gerenciar **convites recebidos**
+
+### Como executar
 
 ```bash
+# Instale dependências
+npm install
+# ou
+yarn install
+
+# Execute em modo de desenvolvimento
 npm run dev
-# or
+# ou
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Acesse em http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ IntelliTrip (Back-end)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Tecnologias utilizadas
 
-## Learn More
+- **Node.js** com **TypeScript**
+- **Express.js** (endpoints de API REST)
+- **Prisma ORM** (integração com banco de dados)
+- **Nodemailer** (envio de e-mails)
+- **Husky** e **Lint-staged** (boas práticas de commits)
+- **ESLint**
 
-To learn more about Next.js, take a look at the following resources:
+### Funcionalidades
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Criação, armazenamento e modifição de **Viagens**
+- API para envio e gerenciamento de **convites por e-mail**
+- Criação e armazenamento de **atividades** relacionadas às viagens
+- Integração com **IA** para sugerir atividades no destino
+- Comunicação com o front-end via **endpoints REST**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Como executar
 
-## Deploy on Vercel
+```bash
+# Instale dependências
+npm install
+# ou
+yarn install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Execute em modo de desenvolvimento
+npm run dev
+# ou
+yarn dev
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Configurações adicionais necessárias:
+# - Variáveis de ambiente (SMTP para e-mails, conexão com banco de dados, chave da IA, etc.)
+# - Migrações do banco (Prisma)
+npx prisma migrate dev
+# ou
+yarn prisma migrate dev
+```
+
+---
+
+## 📌 Estrutura do Projeto
+
+- **IntelliTrip (Front-end):** Interface do usuário em Next.js
+- **Travel-Ai (Back-end):** API em Node.js com Prisma
+
+---
+
+## 📖 Visão Geral
+
+O **IntelliTrip** é um sistema moderno de gestão de viagens que combina a praticidade de organizar atividades com a inteligência artificial para sugerir passeios e experiências personalizadas.  
+Os usuários podem convidar amigos, montar itinerários e acompanhar todas as informações em um só lugar.
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas!  
+Para sugerir melhorias ou reportar problemas, abra uma **issue** ou envie um **pull request**.
