@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { authService } from "@/services/authService";
-import { format } from "date-fns";
+import { format, isAfter, differenceInDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import Header from "@/components/Header";
 import Title from "@/components/Title";
@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { CircleCheckBig } from "lucide-react";
 import { inviteService } from "@/services/inviteService";
 import { useUIStore } from "@/stores/uiStore";
+import Link from "next/link";
 
 interface Travel {
   id: string;
@@ -67,10 +68,6 @@ export default function Perfil() {
   const [createFormStartDate, createSetFormStartDate] = useState("");
   const [createFormEndDate, createSetFormEndDate] = useState("");
 
-  //Estados para exclusão de viagem
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedTravelId, setSelectedTravelId] = useState<string | null>(null);
-
   //Estados para exclusão de convite
   const [deleteInviteDialogOpen, setDeleteInviteDialogOpen] = useState(false);
   const [selectedInviteId, setSelectedInviteId] = useState<string | null>(null);
@@ -78,11 +75,6 @@ export default function Perfil() {
   const openDeleteInviteDialog = (inviteId: string) => {
     setSelectedInviteId(inviteId);
     setDeleteInviteDialogOpen(true);
-  };
-
-  const openDeleteDialog = (travelId: string) => {
-    setSelectedTravelId(travelId);
-    setDeleteDialogOpen(true);
   };
 
   const handleOpenCreateDialog = () => {
@@ -125,7 +117,7 @@ export default function Perfil() {
     try {
       await inviteService.deleteInvite(token, selectedInviteId);
       setInvites((prev) =>
-        prev.filter((invites) => invites.inviteId !== selectedInviteId)
+        prev.filter((invites) => invites.inviteId !== selectedInviteId),
       );
       setDeleteDialogOpen(false);
       setSelectedTravelId(null);
@@ -140,26 +132,21 @@ export default function Perfil() {
     }
   };
 
-  const handleConfirmDelete = async () => {
-    if (!token || !selectedTravelId) return;
-
-    try {
-      await travelService.deleteTravel(token, selectedTravelId);
-      setTravels((prev) =>
-        prev.filter((travel) => travel.id !== selectedTravelId)
+  const getNextTravel = () => {
+    const futureTravels = travels
+      .filter((t) => isAfter(parseISO(t.startDate), new Date()))
+      .sort(
+        (a, b) =>
+          parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime(),
       );
-      setDeleteDialogOpen(false);
-      setSelectedTravelId(null);
-      toast.custom(() => (
-        <div className="flex border border-gray-300 rounded-xl p-2">
-          <p>Viagem deletada com sucesso</p>
-          <CircleCheckBig />
-        </div>
-      ));
-    } catch (error) {
-      alert("Falha ao excluir a viagem. Tente novamente.");
-    }
+
+    return futureTravels[0] || null;
   };
+
+  const nextTravel = getNextTravel();
+  const daysToTrip = nextTravel
+    ? differenceInDays(parseISO(nextTravel.startDate), new Date())
+    : null;
 
   useEffect(() => {
     const userFetchData = async () => {
@@ -218,7 +205,7 @@ export default function Perfil() {
         <div>
           <Header />
           <div className="p-5">
-            <div>
+            <div className="mb-2">
               <h2 className="text-lg font-medium">
                 Olá, {userData.name} Bem-vindo!
               </h2>
@@ -232,6 +219,49 @@ export default function Perfil() {
                 </span>
               </p>
             </div>
+
+            {nextTravel && (
+              <Link href={`/travel/${nextTravel.id}`} className="block mb-8">
+                <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-600 to-teal-500 p-6 text-white shadow-lg transition-transform active:scale-95">
+                  <div className="relative z-10">
+                    <span className="text-xs font-bold uppercase tracking-wider opacity-80">
+                      Sua próxima aventura
+                    </span>
+                    <h3 className="mt-1 text-2xl font-bold">
+                      {nextTravel.destination}
+                    </h3>
+
+                    <div className="mt-4 flex items-end justify-between">
+                      <div>
+                        <p className="text-sm opacity-90">
+                          {format(
+                            parseISO(nextTravel.startDate),
+                            "dd 'de' MMMM",
+                            { locale: ptBR },
+                          )}
+                        </p>
+                        <p className="text-xs opacity-75">Partida em breve</p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-3xl font-black">
+                          {daysToTrip === 0 ? "É hoje!" : `${daysToTrip}`}
+                        </span>
+                        {daysToTrip !== 0 && (
+                          <p className="text-[10px] uppercase font-bold">
+                            Dias restantes
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Elemento decorativo de fundo */}
+                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+                </div>
+              </Link>
+            )}
+
             <Title>Minhas viagens</Title>
             <div className="space-y-2">
               {travels.map((travel) => (
@@ -241,7 +271,6 @@ export default function Perfil() {
                   endDate={travel.endDate}
                   key={travel.id}
                   url={`/travel/${travel.id}`}
-                  onDelete={() => openDeleteDialog(travel.id)}
                 />
               ))}
               <Button onClick={handleOpenCreateDialog} variant={"outline"}>
@@ -337,27 +366,6 @@ export default function Perfil() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
-          <AlertDialogHeader>
-            <p>
-              Tem certeza que deseja excluir esta viagem? Esta ação não pode ser
-              desfeita.
-            </p>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <AlertDialog
         open={deleteInviteDialogOpen}

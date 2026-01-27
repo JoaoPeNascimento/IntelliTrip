@@ -8,16 +8,9 @@ interface TravelData {
   startDate: string;
   endDate: string;
   url: string;
-  onDelete: () => void;
 }
 
-const TravelCard = ({
-  destination,
-  startDate,
-  endDate,
-  url,
-  onDelete,
-}: TravelData) => {
+const TravelCard = ({ destination, startDate, endDate, url }: TravelData) => {
   return (
     <Card className="border border-gray-300 max-w-[370px] w-full">
       <CardContent className="flex flex-col gap-2 px-3 py-4">
@@ -29,9 +22,6 @@ const TravelCard = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" className="p-1" onClick={onDelete}>
-              <TrashIcon className="text-red-600 w-5 h-5" />
-            </Button>
             <Button
               className="capitalize p-1 rounded-xl whitespace-nowrap"
               asChild

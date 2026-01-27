@@ -36,6 +36,7 @@ import { iaService } from "@/services/aiService";
 import { toast } from "sonner";
 import { CircleCheckBig } from "lucide-react";
 import { useSuggestionStore } from "@/stores/suggestionStore";
+import { useRouter } from "next/navigation";
 
 interface Travel {
   id: string;
@@ -76,6 +77,7 @@ interface RespostaIA {
 
 const TravelDetail = ({ params }: TravelDetailProps) => {
   const { id } = React.use(params);
+  const router = useRouter();
   const token = useAuthStore((state) => state.token);
   const [travelData, setTravel] = useState<Travel | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
@@ -98,6 +100,9 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     null,
   );
 
+  // Estados para exclusão de Viagem
+  const [deleteTripDialogOpen, setDeleteTripDialogOpen] = useState(false);
+
   // Estados para criação de atividade
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createFormName, createSetFormName] = useState("");
@@ -114,6 +119,28 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   // Cache para sugestões
   const setCache = useSuggestionStore((state) => state.setCache);
   const getCache = useSuggestionStore((state) => state.getCache);
+
+  const openDeleteTripDialog = () => {
+    setDeleteTripDialogOpen(true);
+  };
+
+  const handleConfirmTripDelete = async () => {
+    if (!token) return;
+
+    try {
+      await travelService.deleteTravel(token, id);
+      setDeleteTripDialogOpen(false);
+      toast.custom(() => (
+        <div className="flex border border-gray-300 rounded-xl p-2">
+          <p>Viagem deletada com sucesso</p>
+          <CircleCheckBig />
+        </div>
+      ));
+      router.push("/home");
+    } catch (error) {
+      alert("Falha ao excluir a viagem. Tente novamente.");
+    }
+  };
 
   const handleGetSuggestions = async () => {
     if (!token || !travelData) return;
@@ -395,6 +422,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
               destination={travelData.destination}
               startDate={travelData.startDate}
               endDate={travelData.endDate}
+              deleteTravel={openDeleteTripDialog}
             />
 
             <InvitesSection
@@ -442,6 +470,30 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
           onSave={handleCreateActivity}
         />
       </Dialog>
+
+      <AlertDialog
+        open={deleteTripDialogOpen}
+        onOpenChange={setDeleteTripDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
+          <AlertDialogHeader>
+            <p>
+              Tem certeza que deseja excluir esta viagem? Esta ação não pode ser
+              desfeita.
+            </p>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmTripDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* AlertDialog de exclusão */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
