@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { iaService } from "@/services/aiService";
 import { toast } from "sonner";
 import { CircleCheckBig } from "lucide-react";
+import { useSuggestionStore } from "@/stores/suggestionStore";
 
 interface Travel {
   id: string;
@@ -59,6 +60,20 @@ interface Invite {
   recieverEmail: string;
 }
 
+interface SugestaoIA {
+  nome: string;
+  descricao: string;
+  categoria: string;
+  endereco: string;
+  horarioFuncionamento: string;
+  dicas: string;
+}
+
+interface RespostaIA {
+  sobre: string;
+  sugestoes: SugestaoIA[];
+}
+
 const TravelDetail = ({ params }: TravelDetailProps) => {
   const { id } = React.use(params);
   const token = useAuthStore((state) => state.token);
@@ -71,7 +86,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   // Estados para edição de atividade
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
-    null
+    null,
   );
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
@@ -80,7 +95,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   // Estados para exclusão de atividade
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
-    null
+    null,
   );
 
   // Estados para criação de atividade
@@ -95,13 +110,23 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
 
   // Estados para sugestão
   const [suggestionDialogOpen, setSuggestionDialogOpen] = useState(false);
-  const [suggestionText, setSuggestionText] = useState("");
+  const [suggestionData, setSuggestionData] = useState<RespostaIA | null>(null);
+  // Cache para sugestões
+  const setCache = useSuggestionStore((state) => state.setCache);
+  const getCache = useSuggestionStore((state) => state.getCache);
 
   const handleGetSuggestions = async () => {
-    if (!token) return;
-    if (!travelData) return;
+    if (!token || !travelData) return;
+
+    const cachedData = getCache(id);
+    if (cachedData) {
+      setSuggestionData(cachedData);
+      setSuggestionDialogOpen(true);
+      return;
+    }
 
     try {
+      setLoading(true);
       const data = await iaService.getRecommendations(token, {
         destination: travelData.destination,
         startDate: travelData.startDate,
@@ -109,14 +134,16 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       });
 
       if (data) {
-        setSuggestionText(data.recommendations);
+        // 3. Salvar no cache para a próxima vez
+        setCache(id, data);
+        setSuggestionData(data);
         setSuggestionDialogOpen(true);
-      } else {
-        alert(data.error || "Erro ao buscar sugestões");
       }
     } catch (error) {
       console.error(error);
-      alert("Erro na requisição de sugestões.");
+      toast.error("Erro na requisição de sugestões.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,7 +157,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     setLoading(true);
     const success = await activityService.deleteActivity(
       activityToDelete.id,
-      token
+      token,
     );
     if (success) {
       setActivities((prev) => prev.filter((a) => a.id !== activityToDelete.id));
@@ -177,12 +204,12 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     const updated = await activityService.updateActivity(
       selectedActivity.id,
       token,
-      updatedData
+      updatedData,
     );
 
     if (updated) {
       setActivities((prev) =>
-        prev.map((a) => (a.id === updated.id ? updated : a))
+        prev.map((a) => (a.id === updated.id ? updated : a)),
       );
       setEditDialogOpen(false);
       toast.custom(() => (
@@ -261,7 +288,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       const activity = await activityService.createActivity(
         id,
         token,
-        activityData
+        activityData,
       );
 
       if (!activity) {
@@ -318,7 +345,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       try {
         const emails: string[] = await inviteService.getInvitesByTrip(
           id,
-          token
+          token,
         );
 
         const invites: Invite[] = emails.map((email) => ({
@@ -468,11 +495,50 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
         open={suggestionDialogOpen}
         onOpenChange={setSuggestionDialogOpen}
       >
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Sugestões de Atividades</DialogTitle>
+            <DialogTitle>Sugestões para {travelData?.destination}</DialogTitle>
           </DialogHeader>
-          <p>{suggestionText}</p>
+
+          {suggestionData && (
+            <div className="space-y-6">
+              <p className="text-sm text-muted-foreground italic">
+                {suggestionData.sobre}
+              </p>
+
+              <div className="space-y-4">
+                {suggestionData.sugestoes.map((sugestao, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg bg-slate-50"
+                  >
+                    <h4 className="font-bold text-lg text-blue-700">
+                      {sugestao.nome}
+                    </h4>
+                    <p className="text-sm mb-2">{sugestao.descricao}</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                      <p>
+                        <strong>📍 Endereço:</strong> {sugestao.endereco}
+                      </p>
+                      <p>
+                        <strong>⏰ Horário:</strong>{" "}
+                        {sugestao.horarioFuncionamento}
+                      </p>
+                      <p>
+                        <strong>🏷️ Categoria:</strong> {sugestao.categoria}
+                      </p>
+                    </div>
+
+                    <div className="mt-2 p-2 bg-amber-50 border-l-4 border-amber-400 text-xs">
+                      <strong>💡 Dica:</strong> {sugestao.dicas}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <DialogFooter>
             <Button onClick={() => setSuggestionDialogOpen(false)}>
               Fechar
