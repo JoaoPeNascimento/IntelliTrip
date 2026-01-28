@@ -1,12 +1,19 @@
 import Link from "next/link";
 import { Card, CardContent } from "./ui/card";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Button } from "./ui/button";
-import { LogOutIcon, MenuIcon } from "lucide-react";
+import { CircleUser, LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useUIStore } from "@/stores/uiStore";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const Header = () => {
   const router = useRouter();
@@ -27,6 +34,14 @@ const Header = () => {
     router.push("/home");
   };
 
+  const pushToUserProfile = () => {
+    router.push("/user");
+  };
+
+  const pushToConfigs = () => {
+    router.push("/configs");
+  };
+
   return (
     <Card className="border-solid border-b-gray-300">
       <CardContent className="flex flex-row justify-between items-center">
@@ -34,29 +49,39 @@ const Header = () => {
           <Image src="/Logo.png" alt="Logo" width={120} height={18} />
         </Link>
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button size="icon">
-              <MenuIcon />
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button variant="ghost" asChild>
+              <CircleUser className="h-16 w-16" />
             </Button>
-          </SheetTrigger>
-          <SheetContent className="flex flex-col gap-2 p-2">
-            <SheetTitle>Menu</SheetTitle>
-            <Button onClick={myTravelClick} variant={"ghost"}>
-              Minhas viagens
-            </Button>
-            <Button onClick={myInvitesClick} variant={"ghost"}>
-              Meus convites
-            </Button>
-            <Button asChild variant={"ghost"}>
-              <Link href={"/user"}>Meu perfil</Link>
-            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40" align="start">
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="text-lg" onClick={pushToUserProfile}>
+                Conta
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
 
-            <Button onClick={onLogout}>
-              Logout <LogOutIcon />
-            </Button>
-          </SheetContent>
-        </Sheet>
+              <DropdownMenuItem className="text-lg" onClick={myTravelClick}>
+                Minhas Viagens
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-lg" onClick={myInvitesClick}>
+                Meus Convites
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem className="text-lg" onClick={pushToConfigs}>
+                Configurações
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={onLogout}
+                className="bg-blue-600 text-white text-lg"
+              >
+                Sair <LogOutIcon className="h-4 w-4 text-white" />
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardContent>
     </Card>
   );
