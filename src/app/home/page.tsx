@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { authService } from "@/services/authService";
 import { format, isAfter, differenceInDays, parseISO } from "date-fns";
@@ -163,7 +163,7 @@ export default function Perfil() {
         <div>
           <Header />
           <div className="p-5">
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <h2 className="text-lg font-medium">
                 Olá, {userData.name} Bem-vindo!
               </h2>
@@ -176,14 +176,14 @@ export default function Perfil() {
                   {format(new Date(), "MMMM", { locale: ptBR })}
                 </span>
               </p>
-            </div>
+            </div> */}
 
             {nextTravel && (
               <Link href={`/travel/${nextTravel.id}`} className="block mb-8">
                 <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-600 to-teal-500 p-6 text-white shadow-lg transition-transform active:scale-95">
                   <div className="relative z-10">
                     <span className="text-xs font-bold uppercase tracking-wider opacity-80">
-                      Sua próxima aventura
+                      Olá {userData.name}, sua próxima aventura
                     </span>
                     <h3 className="mt-1 text-2xl font-bold">
                       {nextTravel.destination}

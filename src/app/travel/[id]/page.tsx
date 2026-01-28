@@ -30,6 +30,7 @@ import { ActivityDialogContent } from "@/components/ActivityDialogContent";
 import React from "react";
 import InvitesSection from "@/components/InvitesSection";
 import ActivitiesSection from "@/components/ActivitiesSection";
+import AILoadingOverlay from "@/components/AiLoadingOverlay";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { iaService } from "@/services/aiService";
@@ -84,6 +85,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   // Estados para edição de atividade
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -153,7 +155,8 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
     }
 
     try {
-      setLoading(true);
+      setAiLoading(true);
+
       const data = await iaService.getRecommendations(token, {
         destination: travelData.destination,
         startDate: travelData.startDate,
@@ -161,7 +164,6 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       });
 
       if (data) {
-        // 3. Salvar no cache para a próxima vez
         setCache(id, data);
         setSuggestionData(data);
         setSuggestionDialogOpen(true);
@@ -170,7 +172,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
       console.error(error);
       toast.error("Erro na requisição de sugestões.");
     } finally {
-      setLoading(false);
+      setAiLoading(false);
     }
   };
 
@@ -413,6 +415,7 @@ const TravelDetail = ({ params }: TravelDetailProps) => {
 
   return (
     <>
+      <AILoadingOverlay visible={aiLoading} />
       <LoadingSpinner visible={showSpinner} />
       {!showSpinner && travelData && (
         <>
