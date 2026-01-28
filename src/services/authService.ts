@@ -18,12 +18,12 @@ interface LoginData {
 
 interface LoginResponse {
   token: string;
-  userId: string;
 }
 
 interface UserData {
   name: string;
   email: string;
+  id: string;
 }
 
 interface CheckEmailResponse {
@@ -119,7 +119,7 @@ export const authService = {
 
   async updateUser(
     data: UpdateUserData,
-    token: string
+    token: string,
   ): Promise<UpdateUserResponse> {
     const res = await fetch(`${apiUrl}/auth/update`, {
       method: "PUT",
