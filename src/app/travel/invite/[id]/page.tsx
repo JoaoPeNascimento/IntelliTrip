@@ -2,6 +2,8 @@
 
 import { useEffect, useState, use } from "react";
 import { travelService } from "@/services/travelService";
+import { inviteService } from "@/services/inviteService";
+import { authService } from "@/services/authService"; // Adicionado para buscar dados do usuário
 import { TravelWithDetails } from "@/schemas/travelWithDetails";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Header from "@/components/Header";
@@ -12,11 +14,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import Title from "@/components/Title";
-import { ChevronDown, CircleCheckBig } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import ActivityCardNoChange from "@/components/ActivityCardNoChange";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
-import { inviteService } from "@/services/inviteService";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,50 +35,90 @@ interface TravelDetailProps {
 
 const TravelInvite = ({ params }: TravelDetailProps) => {
   const { id } = use(params);
+  const router = useRouter();
+
+  // Auth Store
   const token = useAuthStore((state) => state.token);
-  const userId = useAuthStore((state) => state.userId);
+  const storedEmail = useAuthStore((state) => state.email);
+  const setEmail = useAuthStore((state) => state.setEmail); // Para salvar o email se buscarmos da API
+
   const [travel, setTravel] = useState<TravelWithDetails | null>(null);
   const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-
-  // Estados para Dialog de deleção
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Efeito para garantir que temos o email do usuário
+  useEffect(() => {
+    const ensureUserEmail = async () => {
+      if (token && !storedEmail) {
+        try {
+          // Se tem token mas não tem email, busca na API
+          const userData = await authService.getUser(token);
+          if (userData && userData.email) {
+            setEmail(userData.email);
+          }
+        } catch (error) {
+          console.error("Erro ao atualizar dados do usuário:", error);
+        }
+      }
+    };
+    ensureUserEmail();
+  }, [token, storedEmail, setEmail]);
 
   const openDeleteDialog = () => {
     setDeleteDialogOpen(true);
   };
 
   const handleConfirmDeleteInvite = async () => {
+    // Verifica apenas o token inicialmente
     if (!token) {
-      alert("Usuário não autenticado.");
+      toast.error("Você precisa estar logado para realizar esta ação.");
       return;
+    }
+
+    // Tenta obter o email do store ou busca novamente como fallback
+    let userEmail = storedEmail;
+
+    if (!userEmail) {
+      try {
+        const userData = await authService.getUser(token);
+        userEmail = userData.email;
+        setEmail(userData.email); // Atualiza o store para futuras ações
+      } catch (error) {
+        toast.error("Erro ao identificar usuário. Faça login novamente.");
+        return;
+      }
     }
 
     if (!travel) {
-      alert("Viagem não encontrada.");
+      toast.error("Viagem não encontrada.");
       return;
     }
 
-    const inviteId = travel.invites.find((inv) => inv.userId === userId)?.id;
+    // Busca o convite comparando o email
+    const inviteId = travel.invites.find((inv) => inv.email === userEmail)?.id;
 
     if (!inviteId) {
-      alert("Convite não encontrado para o usuário atual.");
+      toast.error("Não foi possível localizar o seu convite nesta viagem.");
+      console.log(
+        "Emails disponíveis na viagem:",
+        travel.invites.map((i) => i.email),
+      );
+      console.log("Email do usuário:", userEmail);
       return;
     }
 
     try {
       await inviteService.deleteInvite(token, inviteId);
       setDeleteDialogOpen(false);
-      toast.custom(() => (
-        <div className="flex border border-gray-300 rounded-xl p-2">
-          <p>Convite deletado com sucesso</p>
-          <CircleCheckBig />
-        </div>
-      ));
+
+      toast.success("Convite removido com sucesso!");
+
+      router.push("/home");
     } catch (error) {
-      alert("Falha ao excluir o convite. Tente novamente." + error);
+      toast.error("Falha ao excluir o convite.");
+      console.error(error);
     }
   };
 
@@ -86,7 +128,8 @@ const TravelInvite = ({ params }: TravelDetailProps) => {
         const data = await travelService.getTravelWithDetails(id);
         setTravel(data);
       } catch (error) {
-        setError("Erro ao carregar viagem" + error);
+        console.error("Erro ao carregar viagem", error);
+        toast.error("Erro ao carregar detalhes da viagem.");
       } finally {
         setLoading(false);
       }
@@ -155,11 +198,11 @@ const TravelInvite = ({ params }: TravelDetailProps) => {
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
-          <AlertDialogTitle>Excluir Viagem</AlertDialogTitle>
+          <AlertDialogTitle>Sair da Viagem</AlertDialogTitle>
           <AlertDialogHeader>
             <p>
-              Tem certeza que deseja excluir esta viagem? Esta ação não pode ser
-              desfeita.
+              Tem certeza que deseja remover o seu convite desta viagem? Você
+              perderá o acesso a estas informações.
             </p>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -168,7 +211,7 @@ const TravelInvite = ({ params }: TravelDetailProps) => {
               onClick={handleConfirmDeleteInvite}
               className="bg-red-600 hover:bg-red-700"
             >
-              Excluir
+              Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
