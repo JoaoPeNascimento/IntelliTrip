@@ -68,15 +68,6 @@ export default function Perfil() {
   const [createFormStartDate, createSetFormStartDate] = useState("");
   const [createFormEndDate, createSetFormEndDate] = useState("");
 
-  //Estados para exclusão de convite
-  const [deleteInviteDialogOpen, setDeleteInviteDialogOpen] = useState(false);
-  const [selectedInviteId, setSelectedInviteId] = useState<string | null>(null);
-
-  const openDeleteInviteDialog = (inviteId: string) => {
-    setSelectedInviteId(inviteId);
-    setDeleteInviteDialogOpen(true);
-  };
-
   const handleOpenCreateDialog = () => {
     setCreateDialogOpen(true);
   };
@@ -108,27 +99,6 @@ export default function Perfil() {
       setCreateDialogOpen(false);
     } catch (error) {
       alert("Erro ao criar a atividade. Tente novamente.");
-    }
-  };
-
-  const handleConfirmDeleteInvite = async () => {
-    if (!token || !selectedInviteId) return;
-
-    try {
-      await inviteService.deleteInvite(token, selectedInviteId);
-      setInvites((prev) =>
-        prev.filter((invites) => invites.inviteId !== selectedInviteId),
-      );
-      setDeleteDialogOpen(false);
-      setSelectedTravelId(null);
-      toast.custom(() => (
-        <div className="flex border border-gray-300 rounded-xl p-2">
-          <p>Convite deletado com sucesso</p>
-          <CircleCheckBig />
-        </div>
-      ));
-    } catch (error) {
-      alert("Falha ao excluir o convite. Tente novamente.");
     }
   };
 
@@ -308,7 +278,6 @@ export default function Perfil() {
                   endDate={invite.endDate}
                   key={invite.id}
                   url={`/travel/invite/${invite.id}`}
-                  onDelete={() => openDeleteInviteDialog(invite.inviteId)}
                 />
               ))}
             </div>
@@ -366,30 +335,6 @@ export default function Perfil() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <AlertDialog
-        open={deleteInviteDialogOpen}
-        onOpenChange={setDeleteInviteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir convite</AlertDialogTitle>
-            <p>
-              Tem certeza que deseja excluir este convite? Esta ação não pode
-              ser desfeita.
-            </p>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDeleteInvite}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

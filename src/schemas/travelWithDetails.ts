@@ -4,6 +4,7 @@ import { z } from "zod";
 export const inviteSchema = z.object({
   id: z.string(),
   email: z.email(),
+  userId: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

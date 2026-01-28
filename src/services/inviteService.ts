@@ -55,7 +55,7 @@ export const inviteService = {
 
   async createInvite(
     token: string,
-    data: { travelId: string; recieverEmail: string }
+    data: { travelId: string; recieverEmail: string },
   ) {
     const res = await fetch(`${apiUrl}/invite`, {
       method: "POST",
@@ -113,7 +113,7 @@ export const inviteService = {
       });
 
       if (!res.ok) {
-        throw new Error("Erro ao deletar o convite.");
+        throw new Error("Erro ao deletar o convite." + res.statusText);
       }
     } catch (error) {
       throw new Error("Erro ao deletar o convite: " + error);
