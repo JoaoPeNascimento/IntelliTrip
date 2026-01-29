@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CircleCheckBig } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
 
 export default function Cadastro() {
   const router = useRouter();
@@ -29,7 +30,15 @@ export default function Cadastro() {
     try {
       const result = await authService.login(data);
 
-      useAuthStore.getState().setToken(result.token, result.userId);
+      if (!result) {
+        return alert("Login falhou. Por favor, tente novamente.");
+      }
+
+      const token = result.token;
+
+      const userId = jwtDecode<{ userId: string }>(token).userId;
+
+      useAuthStore.getState().setToken(token, userId);
 
       router.push("/home");
     } catch (error) {
