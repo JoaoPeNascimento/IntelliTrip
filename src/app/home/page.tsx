@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { inviteService } from "@/services/inviteService";
 import { useUIStore } from "@/stores/uiStore";
 import Link from "next/link";
+import DestinationsCarousel from "@/components/DestinationsCarousel";
 
 interface Travel {
   id: string;
@@ -235,6 +236,7 @@ export default function Perfil() {
                 Planejar Nova Viagem
               </Button>
             </div>
+            <DestinationsCarousel />
           </div>
         </div>
       )}

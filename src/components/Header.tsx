@@ -51,7 +51,7 @@ const Header = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" className="rounded-full" asChild>
               <CircleUser className="h-16 w-16" />
             </Button>
           </DropdownMenuTrigger>
