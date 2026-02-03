@@ -40,23 +40,32 @@ export default function Cadastro() {
 
       useAuthStore.getState().setToken(token, userId);
 
-      router.push("/home");
-    } catch (error) {
-      console.error("Erro ao realizar login:", error);
-      alert("Falha ao realizar login: " + (error as Error).message);
-    }
-
-    toast.custom(() => (
-      <div>
-        <div className="border border-gray-300 rounded-xl p-2">
-          <p>Bem-vindo!</p>
-          <div className="flex">
-            <p>Login realizado com sucesso!</p>
-            <CircleCheckBig />
+      toast.custom(() => (
+        <div>
+          <div className="border border-gray-300 rounded-xl p-2">
+            <p>Bem-vindo!</p>
+            <div className="flex">
+              <p>Login realizado com sucesso!</p>
+              <CircleCheckBig />
+            </div>
           </div>
         </div>
-      </div>
-    ));
+      ));
+
+      router.push("/home");
+    } catch (error) {
+      toast.custom(() => (
+        <div>
+          <div className="border border-gray-300 rounded-xl p-2">
+            <p>Erro ao realizar login!</p>
+            <div className="flex">
+              <p>Login falhou. Por favor, tente novamente.</p>
+            </div>
+          </div>
+        </div>
+      ));
+      console.error("Erro ao realizar login:", error);
+    }
   };
 
   return (

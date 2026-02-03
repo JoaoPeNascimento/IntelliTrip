@@ -38,10 +38,6 @@ const Header = () => {
     router.push("/user");
   };
 
-  const pushToConfigs = () => {
-    router.push("/configs");
-  };
-
   return (
     <Card className="border-solid border-b-gray-300">
       <CardContent className="flex flex-row justify-between items-center">
@@ -69,10 +65,6 @@ const Header = () => {
                 Meus Convites
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-
-              <DropdownMenuItem className="text-lg" onClick={pushToConfigs}>
-                Configurações
-              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={onLogout}
                 className="bg-blue-600 text-white text-lg"
