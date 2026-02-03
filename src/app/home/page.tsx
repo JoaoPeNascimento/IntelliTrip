@@ -245,22 +245,53 @@ export default function Perfil() {
         <div>
           <Header />
           <div className="p-5">
-            <div>
-              <h2 className="text-lg font-medium">
-                Olá, {userData.name} Bem-vindo!
-              </h2>
-              <p>
-                <span className="capitalize">
-                  {format(new Date(), "EEEE, dd", { locale: ptBR })}
-                </span>
-                <span>&nbsp;de&nbsp;</span>
-                <span className="capitalize">
-                  {format(new Date(), "MMMM", { locale: ptBR })}
-                </span>
-              </p>
-            </div>
+            {nextTravel && (
+              <Link href={`/travel/${nextTravel.id}`} className="block mb-8">
+                <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-600 to-teal-500 p-6 text-white shadow-lg transition-transform active:scale-95">
+                  <div className="relative z-10">
+                    <span className="text-xs font-bold uppercase tracking-wider opacity-80">
+                      Olá {userData.name}, sua próxima aventura
+                    </span>
+                    <h3 className="mt-1 text-2xl font-bold">
+                      {nextTravel.destination}
+                    </h3>
+
+                    <div className="mt-4 flex items-end justify-between">
+                      <div>
+                        <p className="text-sm opacity-90">
+                          {format(
+                            parseISO(nextTravel.startDate),
+                            "dd 'de' MMMM",
+                            { locale: ptBR },
+                          )}
+                        </p>
+                        <p className="text-xs opacity-75">Partida em breve</p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-3xl font-black">
+                          {daysToTrip === 0 ? "É hoje!" : `${daysToTrip}`}
+                        </span>
+                        {daysToTrip !== 0 && (
+                          <p className="text-[10px] uppercase font-bold">
+                            Dias restantes
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Elemento decorativo de fundo */}
+                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+                </div>
+              </Link>
+            )}
+
             <Title>Meus Convites</Title>
             <div className="space-y-2">
+              {invites.length === 0 && (
+                <p>Você não possui convites no momento.</p>
+              )}
               {invites.map((invite) => (
                 <TravelCard
                   destination={invite.destination}
@@ -271,6 +302,7 @@ export default function Perfil() {
                 />
               ))}
             </div>
+            <DestinationsCarousel />
           </div>
         </div>
       )}
