@@ -69,7 +69,7 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-5">
       <Card className="w-full max-w-md shadow-xl p-6">
         <CardContent>
           <h1 className="text-2xl font-bold text-center mb-6 ">
